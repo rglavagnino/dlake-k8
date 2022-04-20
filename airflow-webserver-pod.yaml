@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.network/datadac: "true"
+    io.kompose.service: airflow-webserver
+  name: airflow-webserver
+spec:
+  containers:
+    - image: puckel/docker-airflow:1.10.9
+      livenessProbe:
+        httpGet:
+          path: /admin/
+          port: 8080
+        failureThreshold: 3
+        periodSeconds: 30
+        timeoutSeconds: 20
+      name: airflow-container
+      ports:
+        - containerPort: 8080
+      resources: {}
+      volumeMounts:
+        - mountPath: /home/dlake/airflow/airflow/data
+          name: airflow-data
+        - mountPath: /home/dlake/air/airflow/logs
+          name: airflow-logs
+        - mountPath: /usr/local/airflow/dags
+          name: airflow-webserver-claim2
+        - mountPath: /requirements.txt
+          name: airflow-webserver-claim3
+  hostname: dacairflow
+  restartPolicy: OnFailure
+  volumes:
+    - name: airflow-data
+      persistentVolumeClaim:
+        claimName: airflow-data
+    - name: airflow-logs
+      persistentVolumeClaim:
+        claimName: airflow-logs
+    - name: airflow-webserver-claim2
+      persistentVolumeClaim:
+        claimName: airflow-webserver-claim2
+    - name: airflow-webserver-claim3
+      persistentVolumeClaim:
+        claimName: airflow-webserver-claim3
+status: {}

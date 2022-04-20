@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.network/datadac: "true"
+    io.kompose.service: nifi
+  name: nifi
+spec:
+  containers:
+    - env:
+        - name: NIFI_CLUSTER_IS_NODE
+          value: "true"
+        - name: NIFI_CLUSTER_NODE_PROTOCOL_PORT
+          value: "8082"
+        - name: NIFI_ELECTION_MAX_WAIT
+          value: 30 sec
+        - name: NIFI_SENSITIVE_PROPS_KEY
+          value: '''12345678901234567890A'''
+        - name: NIFI_WEB_HTTP_PORT
+          value: "8080"
+        - name: NIFI_ZK_CONNECT_STRING
+          value: myzookeeper:2181
+      image: apache/nifi:1.14.0
+      livenessProbe:
+        httpGet:
+          path: /nifi/
+          port: 8080
+        failureThreshold: 3
+        periodSeconds: 30
+        timeoutSeconds: 20
+      name: nifi-container
+      ports:
+        - containerPort: 8080
+      resources: {}
+      volumeMounts:
+        - mountPath: /home/dlake/nifi/nifi-current/database_repository
+          name: nifi-database-repository
+        - mountPath: /home/dlake/nifi-current/flowfile_repository
+          name: nifi-flowfile-repository
+        - mountPath: /home/dlake/nifi/nifi-current/content_repository
+          name: nifi-content-repository
+        - mountPath: /home/dlake/nifi/nifi-current/provenance_repository
+          name: nifi-provenance-repository
+        - mountPath: /home/dlake/nifi/nifi-current/conf
+          name: nifi-conf
+        - mountPath: /home/dlake/nifi/nifi-current/state
+          name: nifi-state
+        - mountPath: /home/dlake/nifi/nifi-current/logs
+          name: nifi-claim6
+        - mountPath: /home/dlake/nifi/nifi-current/jdbc
+          name: nifi-claim7
+        - mountPath: /home/dlake/nifi/nifi-current/credentials
+          name: nifi-claim8
+  hostname: dacnifi
+  restartPolicy: OnFailure
+  volumes:
+    - name: nifi-database-repository
+      persistentVolumeClaim:
+        claimName: nifi-database-repository
+    - name: nifi-flowfile-repository
+      persistentVolumeClaim:
+        claimName: nifi-flowfile-repository
+    - name: nifi-content-repository
+      persistentVolumeClaim:
+        claimName: nifi-content-repository
+    - name: nifi-provenance-repository
+      persistentVolumeClaim:
+        claimName: nifi-provenance-repository
+    - name: nifi-conf
+      persistentVolumeClaim:
+        claimName: nifi-conf
+    - name: nifi-state
+      persistentVolumeClaim:
+        claimName: nifi-state
+    - name: nifi-claim6
+      persistentVolumeClaim:
+        claimName: nifi-claim6
+    - name: nifi-claim7
+      persistentVolumeClaim:
+        claimName: nifi-claim7
+    - name: nifi-claim8
+      persistentVolumeClaim:
+        claimName: nifi-claim8
+status: {}
