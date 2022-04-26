@@ -23,7 +23,7 @@ spec:
         - name: NIFI_WEB_HTTP_PORT
           value: "8080"
         - name: NIFI_ZK_CONNECT_STRING
-          value: myzookeeper:2181
+          value: daczookeeper:2181
       image: apache/nifi:1.14.0
       livenessProbe:
         httpGet:
