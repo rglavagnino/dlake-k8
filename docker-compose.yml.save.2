@@ -153,18 +153,15 @@ services:
         container_name: minio_container
         image: 'bitnami/minio:2022' 
         environment:
-            - MINIO_ROOT_USER=admin
-            - MINIO_ROOT_PASSWORD=lapicero2
-            - MINIO_ACCESS_KEY=admin
-            - MINIO_SECRET_KEY=lapicero2
-            - MINIO_DISTRIBUTED_MODE_ENABLED=yes
-            - MINIO_DISTRIBUTED_NODES=minio,minio2,minio3,minio4
-            - MINIO_SKIP_CLIENT=yes
+            MINIO_ACCESS_KEY: admin
+            MINIO_SECRET_KEY: lapicero2
+	    MINIO_DISTRIBUTED_MODE_ENABLED=yes
+            MINIO_DISTRIBUTED_NODES=minio,minio2,minio3,minio4
         ports:
             - '9000:9000'
             - '9001:9001'
         volumes:
-            - '/home/rlavagnino/data1:/data'
+            - '/home/rlavagnino/data:/data'
         networks:
             - datadac
         healthcheck:
@@ -176,56 +173,12 @@ services:
 
     minio2:
         hostname: dacminio2
-        container_name: minio_container2
-        image: 'bitnami/minio:2022'
-        environment:
-            - MINIO_ROOT_USER=admin
-            - MINIO_ROOT_PASSWORD=lapicero2
-            - MINIO_ACCESS_KEY=admin
-            - MINIO_SECRET_KEY=lapicero2
-            - MINIO_DISTRIBUTED_MODE_ENABLED=yes
-            - MINIO_DISTRIBUTED_NODES= minio,minio2,minio3,minio4
-            - MINIO_SKIP_CLIENT=yes
-        volumes:
-            - '/home/rlavagnino/data2:/data'
-
-        networks:
-            - datadac
-
-    minio3:
-        hostname: dacminio3
-        container_name: minio_container3
-        image: 'bitnami/minio:2022'
-        environment:
-            - MINIO_ROOT_USER=admin
-            - MINIO_ROOT_PASSWORD=lapicero2
-            - MINIO_ACCESS_KEY=admin
-            - MINIO_SECRET_KEY=lapicero2
-            - MINIO_DISTRIBUTED_MODE_ENABLED=yes
-            - MINIO_DISTRIBUTED_NODES=minio,minio2,minio3,minio4
-            - MINIO_SKIP_CLIENT=yes
-        volumes:
-            - '/home/rlavagnino/data3:/data'
-        networks:
-            - datadac 
-    
-
-    minio4:
-        hostname: dacminio4
-        container_name: minio_container4
-        image: 'bitnami/minio:2022'
-        environment:
-            - MINIO_ROOT_USER=admin
-            - MINIO_ROOT_PASSWORD=lapicero2
-            - MINIO_ACCESS_KEY=admin
-            - MINIO_SECRET_KEY=lapicero2
-            - MINIO_DISTRIBUTED_MODE_ENABLED=yes
-            - MINIO_DISTRIBUTED_NODES=minio,minio2,minio3,minio4
-            - MINIO_SKIP_CLIENT=yes
-        volumes:
-            - '/home/rlavagnino/data4:/data'
-        networks:
-            - datadac
+	container_name:minio_container2
+	image: 'bitnami/minio:2022'
+	environment:
+	    MINIO_ACCESS_KEY: admin
+	    MINIO_SECRET_KEY: LAPICERO2
+	    MINIO_DISTRIBUTED_MODE_ENABLED=yes
 
 #Elastic search
             
@@ -239,8 +192,6 @@ services:
             - discovery.type=single-node        
         cap_add: 
             - IPC_LOCK
-        networks:
-            - datadac
         volumes:
             - elasticsearch-data-volume:/home/dlake/elasticsearch/data
         ports:
@@ -250,8 +201,6 @@ services:
         container_name: kibana_container
         image: docker.elastic.co/kibana/kibana:7.12.0
         restart: always
-        networks:
-            - datadac
         environment:
             SERVER_NAME: kibana
             ELASTICSEARCH_HOSTS: http://elasticsearch:9200
