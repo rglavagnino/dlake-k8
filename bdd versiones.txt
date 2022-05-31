@@ -1,0 +1,18 @@
+create schema bases;
+
+create table bases.cat_bases(
+	id SERIAL primary key,
+	nombre varchar(50),
+	dependencia varchar(6),
+	activo int
+
+);
+
+create table bases.versiones(
+	id Serial primary key,
+	id_base int,
+	version int,
+	activo int,
+	constraint fk_version
+	foreign key (id_base) references bases.cat_bases on delete set null
+)
