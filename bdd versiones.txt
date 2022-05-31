@@ -16,3 +16,6 @@ create table bases.versiones(
 	constraint fk_version
 	foreign key (id_base) references bases.cat_bases on delete set null
 )
+
+
+insert into bases.cat_bases(nombre,dependencia,activo) values ('Base 72', 'DTSI',1)
