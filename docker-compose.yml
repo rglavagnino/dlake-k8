@@ -49,9 +49,9 @@ services:
             - nifi-provenance_repository:/home/dlake/nifi/nifi-current/provenance_repository
             - nifi-conf:/home/dlake/nifi/nifi-current/conf
             - nifi-state:/home/dlake/nifi/nifi-current/state
-            - ./nifi/logs:/home/dlake/nifi/nifi-current/logs
-            - ./nifi/jdbc:/home/dlake/nifi/nifi-current/jdbc
-            - ./nifi/credentials:/home/dlake/nifi/nifi-current/credentials
+            - /home/rlavagnino/nifi/logs:/home/dlake/nifi/nifi-current/logs
+            - /home/rlavagnino/nifi/jdbc:/home/dlake/nifi/nifi-current/jdbc
+            - /home/rlavagnino/nifi/credentials:/home/dlake/nifi/nifi-current/credentials
         environment:
             - NIFI_WEB_HTTP_PORT=8080
             - NIFI_CLUSTER_IS_NODE=true
