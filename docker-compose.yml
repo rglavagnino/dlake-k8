@@ -13,8 +13,8 @@ services:
         volumes:
             - airflow-data:/home/dlake/airflow/airflow/data
             - airflow-logs:/home/dlake/air/airflow/logs
-            - ./airflow/dags:/usr/local/airflow/dags
-            - ./airflow/requirements/requirements.txt:/requirements.txt
+            - /home/rlavagnino/lake/airflow/dags:/usr/local/airflow/dags
+            - /home/rlavagnino/lake/airflow/requirements/requirements.txt:/requirements.txt
         restart: on-failure
         healthcheck:
             test: ["CMD", "curl", "-f", "http://myairflow:8080/admin/"]
@@ -43,15 +43,15 @@ services:
         networks:
             - datadac
         volumes:
-            - nifi-database_repository:/home/dlake/nifi/nifi-current/database_repository
-            - nifi-flowfile_repository:/home/dlake/nifi-current/flowfile_repository
-            - nifi-content_repository:/home/dlake/nifi/nifi-current/content_repository
-            - nifi-provenance_repository:/home/dlake/nifi/nifi-current/provenance_repository
-            - nifi-conf:/home/dlake/nifi/nifi-current/conf
-            - nifi-state:/home/dlake/nifi/nifi-current/state
-            - /home/rlavagnino/nifi/logs:/home/dlake/nifi/nifi-current/logs
-            - /home/rlavagnino/nifi/jdbc:/home/dlake/nifi/nifi-current/jdbc
-            - /home/rlavagnino/nifi/credentials:/home/dlake/nifi/nifi-current/credentials
+            - /home/rlavagnino/lake/nifi/nifi-database_repository:/opt/nifi/database_repository
+            - /home/rlavagnino/lake/nifi/nifi-flowfile_repository:/opt/nifi/flowfile_repository
+            - /home/rlavagnino/lake/nifi/nifi-content_repository:/opt/nifi/content_repository
+            - /home/rlavagnino/lake/nifi/nifi-provenance_repository:/opt/nifi/provenance_repository
+            - /home/rlavagnino/lake/nifi/conf:/opt/nifi/conf
+            - /home/rlavagnino/lake/nifi/nifi-state:/opt/nifi/state
+            - /home/rlavagnino/lake/nifi/logs:/opt/nifi/logs
+            - /home/rlavagnino/lake/nifi/jdbc:/opt/nifi/jdbc
+            - /home/rlavagnino/lake/nifi/credentials:/opt/nifi/credentials
         environment:
             - NIFI_WEB_HTTP_PORT=8080
             - NIFI_CLUSTER_IS_NODE=true
@@ -80,8 +80,8 @@ services:
             - NIFI_REGISTRY_FLOW_PROVIDER=file
             - NIFI_REGISTRY_FLOW_STORAGE_DIR=/opt/nifi-registry/flow_storage
         volumes:
-            - /home/rlavagnino/nifi/database:/opt/nifi-registry/database
-            - /home/rlavagnino/nifi/flow_storage:/opt/nifi-registry/flow_storage
+            - /home/rlavagnino/lake/nifi_reg/database:/opt/nifi-registry/database
+            - /home/rlavagnino/lake/nifi_reg/flow_storage:/opt/nifi-registry/flow_storage
         networks:
             - datadac
         healthcheck:
@@ -100,7 +100,7 @@ services:
             POSTGRES_PASSWORD: 'lapicero2'
             PGDATA: /data/postgres
         volumes:
-            - /home/rlavagnino/data/postgres:/data/postgres
+            - /home/rlavagnino/lake/data/postgres:/data/postgres
         ports:
             - "5432:5432"
         networks:
@@ -122,7 +122,7 @@ services:
             PGADMIN_DEFAULT_PASSWORD: 'admin'
             PGADMIN_CONFIG_SERVER_MODE: 'False'
         volumes:
-            - /home/rlavagnino/data/pgadmin:/var/lib/pgadmin
+            - /home/rlavagnino/lake/data/pgadmin:/var/lib/pgadmin
         ports:
             - "5050:80"
         networks:
@@ -141,7 +141,7 @@ services:
         ports:
             - 27017:27017
         volumes:
-            - /home/dlake/db:/data/db
+            - /home/rlavagnino/lake/data/mongo:/data/db
         networks:
             - datadac
         environment:
@@ -164,7 +164,7 @@ services:
             - '9000:9000'
             - '9001:9001'
         volumes:
-            - '/home/rlavagnino/data1:/data'
+            - '/home/rlavagnino/lake/data1:/data'
         networks:
             - datadac
         healthcheck:
@@ -187,7 +187,7 @@ services:
             - MINIO_DISTRIBUTED_NODES= minio,minio2,minio3,minio4
             - MINIO_SKIP_CLIENT=yes
         volumes:
-            - '/home/rlavagnino/data2:/data'
+            - '/home/rlavagnino/lake/data2:/data'
 
         networks:
             - datadac
@@ -205,7 +205,7 @@ services:
             - MINIO_DISTRIBUTED_NODES=minio,minio2,minio3,minio4
             - MINIO_SKIP_CLIENT=yes
         volumes:
-            - '/home/rlavagnino/data3:/data'
+            - '/home/rlavagnino/lake/data3:/data'
         networks:
             - datadac 
     
@@ -223,7 +223,7 @@ services:
             - MINIO_DISTRIBUTED_NODES=minio,minio2,minio3,minio4
             - MINIO_SKIP_CLIENT=yes
         volumes:
-            - '/home/rlavagnino/data4:/data'
+            - '/home/rlavagnino/lake/data4:/data'
         networks:
             - datadac
 
@@ -242,7 +242,7 @@ services:
         networks:
             - datadac
         volumes:
-            - elasticsearch-data-volume:/home/dlake/elasticsearch/data
+            - /home/rlavagnino/lake/data/elastic:/home/dlake/elasticsearch/data
         ports:
             - "9200:9200"
             
