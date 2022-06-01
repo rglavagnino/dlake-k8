@@ -1,0 +1,2 @@
+--copiar del docker, hacerlo primera vez
+docker cp 7554d9c68c8f:/opt/nifi/nifi-current/conf ./nifi/
