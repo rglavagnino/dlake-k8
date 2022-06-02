@@ -1,0 +1,7 @@
+${filename}.${now():format("yyyy_MM_dd HH:mm:ss.SSS'z'")}
+
+
+se agrega al procesador Update attribute
+
+en condicion ponemos una mala 
+${filename:notNull()}

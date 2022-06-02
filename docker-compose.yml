@@ -58,7 +58,7 @@ services:
 #dtetener el contenedor
 #copiar en la carpeta conf del server
 #reiniciar el contenedor
-# cp -R * /home/rlavagnino/lake/nifi/conf/
+# cp 399f9f28j3:/home/rlavagnino/lake/nifi/conf/ .
             - /home/rlavagnino/lake/nifi/conf:/opt/nifi/nifi-current/conf
 
 ######
