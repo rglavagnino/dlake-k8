@@ -242,8 +242,8 @@ services:
 #Elastic search
             
     elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
-        container_name: elasticsearch_container
+        image: elasticsearch:8.2.2
+        container_name: dacelasticsearch
         restart: always
         hostname: dacelastic
         environment:
@@ -255,13 +255,13 @@ services:
         networks:
             - datadac
         volumes:
-            - /home/rlavagnino/lake/data/elastic:/home/dlake/elasticsearch/data
+            - /home/rlavagnino/lake/data/elastic:/usr/share/elasticsearch/data
         ports:
             - "9200:9200"
             
     kibana:
-        container_name: kibana_container
-        image: docker.elastic.co/kibana/kibana:7.12.0
+        container_name: dackibana
+        image: kibana:8.2.2
         restart: always
         networks:
             - datadac
@@ -270,9 +270,31 @@ services:
             ELASTICSEARCH_HOSTS: http://elasticsearch:9200
         ports:
             - "5601:5601"
+        volumes:
+            - /home/rlavagnino/lake/data/kibana:/usr/share/kibana/data             
         depends_on:
             - elasticsearch
 
+#    logstash:
+#        container_name: daclogstash
+#        image: logstash:8.2.2
+#        restart: always
+#        networks:
+#            - datadac
+#        environment:
+#            - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+#            - "ELASTICSEARCH_HOSTS= http://elasticsearch:9200"
+#            - "PATH_CONFIG= /usr/share/logstash/config"
+#        volumes:
+#            - /home/rlavagnino/lake/data/logstash/pipeline:/usr/share/logstash/pipeline
+#            - /home/rlavagnino/lake/data/logstash/setting:/usr/share/logstash/config
+#            - /home/rlavagnino/lake/data/logstash/pipeline/logstash.yml:/usr/share/logstash/config/logstash.yml
+#        ports:
+#            - "9600:9600"
+#            - "5000:5000"
+#        depends_on:
+#            - elasticsearch   
+           
 volumes:
     airflow-data:
     airflow-logs:
