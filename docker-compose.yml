@@ -284,11 +284,12 @@ services:
         environment:
             - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
             - "ELASTICSEARCH_HOSTS= http://elasticsearch:9200"
-            - "PATH_CONFIG= /usr/share/logstash/config"
+            - "PATH_CONFIG= /usr/share/logstash/pipeline/*.conf"
         volumes:
             - /home/rlavagnino/lake/data/logstash/pipeline:/usr/share/logstash/pipeline
+#            - /home/rlavagnino/lake/data/logstash/load:/usr/share/logstash/load            
             - /home/rlavagnino/lake/data/logstash/config:/usr/share/logstash/config
-#            - /home/rlavagnino/lake/data/logstash/pipeline/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,z
+#            - /home/rlavagnino/lake/data/logstash/pipeline/logstash.yml:/usr/share/logstash/config/logstash.yml
         ports:
             - "9600:9600"
             - "5000:5000"
