@@ -275,25 +275,25 @@ services:
         depends_on:
             - elasticsearch
 
-    logstash:
-        container_name: daclogstash
-        image: logstash:8.2.2
-        restart: always
-        networks:
-            - datadac
-        environment:
-            - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-            - "ELASTICSEARCH_HOSTS= http://elasticsearch:9200"
-            - "PATH_CONFIG= /usr/share/logstash/config"
-        volumes:
-            - /home/rlavagnino/lake/data/logstash/pipeline:/usr/share/logstash/pipeline
-            - /home/rlavagnino/lake/data/logstash/config:/usr/share/logstash/config
-#            - /home/rlavagnino/lake/data/logstash/pipeline/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,z
-        ports:
-            - "9600:9600"
-            - "5000:5000"
-        depends_on:
-            - elasticsearch   
+#    logstash:
+#        container_name: daclogstash
+#        image: logstash:8.2.2
+#        restart: always
+#        networks:
+#            - datadac
+#        environment:
+#            - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+#            - "ELASTICSEARCH_HOSTS= http://elasticsearch:9200"
+#            - "PATH_CONFIG= /usr/share/logstash/config"
+#        volumes:
+#            - /home/rlavagnino/lake/data/logstash/pipeline:/usr/share/logstash/pipeline
+#            - /home/rlavagnino/lake/data/logstash/setting:/usr/share/logstash/config
+#            - /home/rlavagnino/lake/data/logstash/pipeline/logstash.yml:/usr/share/logstash/config/logstash.yml
+#        ports:
+#            - "9600:9600"
+#            - "5000:5000"
+#        depends_on:
+#            - elasticsearch   
            
 volumes:
     airflow-data:
