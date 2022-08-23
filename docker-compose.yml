@@ -17,7 +17,7 @@ services:
             - /home/rlavagnino/lake/airflow/requirements/requirements.txt:/requirements.txt
         restart: on-failure
         healthcheck:
-            test: ["CMD", "curl", "-f", "http://myairflow:8080/admin/"]
+            test: ["CMD", "curl", "-f", "http://myairflow:8085/admin/"]
             interval: 30s
             timeout: 20s
             retries: 3
@@ -141,7 +141,7 @@ services:
             - datadac
         restart: on-failure
         healthcheck:
-            test: ["CMD", "curl", "-f", "http://mypgadmin:80/misc/ping"]
+            test: ["CMD", "curl", "-f", "http://mypgadmin:5050/misc/ping"]
             interval: 30s
             timeout: 20s
             retries: 3
@@ -159,6 +159,12 @@ services:
         environment:
             - MONGO_INITDB_ROOT_USERNAME=admin
             - MONGO_INITDB_ROOT_PASSWORD=lapicero2
+        healthcheck:
+            test: echo 'db.runCommand("ping").ok' | mongo dacmongo:27017/productiondb --quiet
+            interval: 10s
+            timeout: 10s
+            retries: 3
+
     # lago
     minio:
         hostname: dacminio
@@ -203,6 +209,11 @@ services:
 
         networks:
             - datadac
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://dacminio2:9000/minio/health/live"]
+            interval: 30s
+            timeout: 20s
+            retries: 3
 
     minio3:
         hostname: dacminio3
@@ -220,7 +231,11 @@ services:
             - '/home/rlavagnino/lake/data3:/data'
         networks:
             - datadac 
-    
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://dacminio3:9000/minio/health/live"]
+            interval: 30s
+            timeout: 20s
+            retries: 3
 
     minio4:
         hostname: dacminio4
@@ -238,6 +253,11 @@ services:
             - '/home/rlavagnino/lake/data4:/data'
         networks:
             - datadac
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://dacminio4:9000/minio/health/live"]
+            interval: 30s
+            timeout: 20s
+            retries: 3
 
 #Elastic search
             
@@ -258,6 +278,11 @@ services:
             - /home/rlavagnino/lake/data/elastic:/usr/share/elasticsearch/data
         ports:
             - "9200:9200"
+        healthcheck:
+            test: curl -s http://dacelasticsearch:9200 >/dev/null || exit 1
+            interval: 30s
+            timeout: 20s
+            retries: 3
             
     kibana:
         container_name: dackibana
@@ -274,6 +299,12 @@ services:
             - /home/rlavagnino/lake/data/kibana:/usr/share/kibana/data             
         depends_on:
             - elasticsearch
+        healthcheck:
+            test: curl -s http://dackibana:5601 >/dev/null || exit 1
+            interval: 30s
+            timeout: 20s
+            retries: 3
+
 
     logstash:
         container_name: daclogstash
@@ -295,6 +326,12 @@ services:
             - "5000:5000"
         depends_on:
             - elasticsearch   
+        healthcheck:
+            test: curl -s http://daclogstash:9600 >/dev/null || exit 1
+            interval: 30s
+            timeout: 20s
+            retries: 3
+
            
 volumes:
     airflow-data:
