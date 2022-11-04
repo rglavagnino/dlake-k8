@@ -1,0 +1,246 @@
+version: "3"
+services:
+    dacapache:
+        image: httpd:2.4-alpine
+        container_name: dachttp_contenedor
+        networks:
+          - datadac
+        ports:
+          - 80:8080
+          - 443:8443
+        volumes:
+          - /home/rlavagnino/data/www:/usr/local/apache2/htdocs
+        healthcheck:
+          test: ["CMD", "curl", "--fail http://dachttp:80/ || exit 1"]
+          interval: 5s
+          timeout: 3s
+          retries: 3
+
+    daccache:
+      image: redis:7.0.4-alpine
+      container_name: dacredis_contenedor
+      restart: always
+      ports:
+        - 9400:6379
+      environment:
+        - REDIS_REPLICATION_MODE=master
+      volumes:
+        - /home/rlavagnino/data/cache/data:/data
+        - /home/rlavagnino/data/cache/redis-data:/var/lib/redis
+        - /home/rlavagnino/data/cache/redis.conf:/usr/local/etc/redis/redis.conf
+      command: redis-server --save 60 1 --requirepass lapicero2 --loglevel warning
+      healthcheck:
+        test: ["CMD", "redis-cli", "ping"]
+        interval: 1s
+        timeout: 3s
+        retries: 30
+
+    bddata:
+        hostname: dacmongodata
+        container_name: mgdata_contenedor
+        image: mongo:6.0
+        ports:
+            - 9031:27017
+        volumes:
+            - /home/rlavagnino/lake/data/mongodata:/data/db
+        networks:
+            - datadac
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=admin
+            - MONGO_INITDB_ROOT_PASSWORD=lapicero2
+        healthcheck:
+            test: echo 'db.runCommand("ping").ok' | mongo dacmongodata:27017/productiondb --quiet
+            interval: 10s
+            timeout: 10s
+            retries: 3
+
+    bdctrl:
+        hostname: dacmongoctrl
+        container_name: mgctrl_contenedor
+        image: mongo:6.0
+        ports:
+            - 9032:27017
+        volumes:
+            - /home/rlavagnino/lake/data/mongoctrl:/data/db
+        networks:
+            - datadac
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=admin
+            - MONGO_INITDB_ROOT_PASSWORD=lapicero2
+        healthcheck:
+            test: echo 'db.runCommand("ping").ok' | mongo dacmongoctrl:27017/productiondb --quiet
+            interval: 10s
+            timeout: 10s
+            retries: 3
+
+    # lago
+    minio:
+        hostname: dacminio
+        container_name: minio_container
+        image: 'bitnami/minio:2022' 
+        environment:
+            - MINIO_ROOT_USER=admin
+            - MINIO_ROOT_PASSWORD=lapicero2
+            - MINIO_ACCESS_KEY=admin
+            - MINIO_SECRET_KEY=lapicero2
+            - MINIO_DISTRIBUTED_MODE_ENABLED=yes
+            - MINIO_DISTRIBUTED_NODES=minio,minio2,minio3,minio4
+            - MINIO_SKIP_CLIENT=yes
+        ports:
+            - '9000:9000'
+            - '9001:9001'
+        volumes:
+            - '/home/rlavagnino/lake/data1:/data'
+        networks:
+            - datadac
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://dacminio:9000/minio/health/live"]
+            interval: 30s
+            timeout: 20s
+            retries: 3
+
+
+    minio2:
+        hostname: dacminio2
+        container_name: minio_container2
+        image: 'bitnami/minio:2022'
+        environment:
+            - MINIO_ROOT_USER=admin
+            - MINIO_ROOT_PASSWORD=lapicero2
+            - MINIO_ACCESS_KEY=admin
+            - MINIO_SECRET_KEY=lapicero2
+            - MINIO_DISTRIBUTED_MODE_ENABLED=yes
+            - MINIO_DISTRIBUTED_NODES= minio,minio2,minio3,minio4
+            - MINIO_SKIP_CLIENT=yes
+        volumes:
+            - '/home/rlavagnino/lake/data2:/data'
+
+        networks:
+            - datadac
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://dacminio2:9000/minio/health/live"]
+            interval: 30s
+            timeout: 20s
+            retries: 3
+
+    minio3:
+        hostname: dacminio3
+        container_name: minio_container3
+        image: 'bitnami/minio:2022'
+        environment:
+            - MINIO_ROOT_USER=admin
+            - MINIO_ROOT_PASSWORD=lapicero2
+            - MINIO_ACCESS_KEY=admin
+            - MINIO_SECRET_KEY=lapicero2
+            - MINIO_DISTRIBUTED_MODE_ENABLED=yes
+            - MINIO_DISTRIBUTED_NODES=minio,minio2,minio3,minio4
+            - MINIO_SKIP_CLIENT=yes
+        volumes:
+            - '/home/rlavagnino/lake/data3:/data'
+        networks:
+            - datadac 
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://dacminio3:9000/minio/health/live"]
+            interval: 30s
+            timeout: 20s
+            retries: 3
+
+    minio4:
+        hostname: dacminio4
+        container_name: minio_container4
+        image: 'bitnami/minio:2022'
+        environment:
+            - MINIO_ROOT_USER=admin
+            - MINIO_ROOT_PASSWORD=lapicero2
+            - MINIO_ACCESS_KEY=admin
+            - MINIO_SECRET_KEY=lapicero2
+            - MINIO_DISTRIBUTED_MODE_ENABLED=yes
+            - MINIO_DISTRIBUTED_NODES=minio,minio2,minio3,minio4
+            - MINIO_SKIP_CLIENT=yes
+        volumes:
+            - '/home/rlavagnino/lake/data4:/data'
+        networks:
+            - datadac
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://dacminio4:9000/minio/health/live"]
+            interval: 30s
+            timeout: 20s
+            retries: 3
+
+#Elastic search
+            
+    elasticsearch:
+        image: elasticsearch:8.2.2
+        container_name: dacelasticsearch
+        restart: always
+        hostname: dacelastic
+        environment:
+            - xpack.security.enabled=false
+            - discovery.type=single-node
+            - "ES_JAVA_OPTS=-Xms1g -Xmx1g"        
+        cap_add: 
+            - IPC_LOCK
+        networks:
+            - datadac
+        volumes:
+            - /home/rlavagnino/data/elastic:/usr/share/elasticsearch/data
+        ports:
+            - "9200:9200"
+        healthcheck:
+            test: curl -s http://dacelasticsearch:9200 >/dev/null || exit 1
+            interval: 30s
+            timeout: 20s
+            retries: 3
+            
+    kibana:
+        container_name: dackibana
+        image: kibana:8.2.2
+        restart: always
+        networks:
+            - datadac
+        environment:
+            SERVER_NAME: kibana
+            ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+        ports:
+            - "9300:5601"
+        volumes:
+            - /home/rlavagnino/data/kibana:/usr/share/kibana/data             
+        depends_on:
+            - elasticsearch
+        healthcheck:
+            test: curl -s http://dackibana:5600 >/dev/null || exit 1
+            interval: 30s
+            timeout: 20s
+            retries: 3
+
+
+    logstash:
+        container_name: daclogstash
+        image: logstash:8.2.2
+        restart: always
+        networks:
+            - datadac
+        environment:
+            - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+            - "ELASTICSEARCH_HOSTS= http://elasticsearch:9200"
+            - "PATH_CONFIG= /usr/share/logstash/pipeline/*.conf"
+        volumes:
+            - /home/rlavagnino/data/logstash/pipeline:/usr/share/logstash/pipeline
+#            - /home/rlavagnino/lake/data/logstash/load:/usr/share/logstash/load            
+            - /home/rlavagnino/data/logstash/config:/usr/share/logstash/config
+#            - /home/rlavagnino/lake/data/logstash/pipeline/logstash.yml:/usr/share/logstash/config/logstash.yml
+        ports:
+            - "9600:9600"
+            - "5000:5000"
+        depends_on:
+            - elasticsearch   
+        healthcheck:
+            test: curl -s http://daclogstash:9600 >/dev/null || exit 1
+            interval: 30s
+            timeout: 20s
+            retries: 3
+
+           
+networks:
+    datadac:
+        driver: bridge
